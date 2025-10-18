@@ -41,6 +41,22 @@ export const Header = () => {
             >
               Swap
             </Link>
+            <Link
+              to="/mining"
+              className={`transition-colors ${
+                isActive('/mining') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Mining
+            </Link>
+            <Link
+              to="/admin"
+              className={`transition-colors ${
+                isActive('/admin') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Admin
+            </Link>
           </nav>
 
           <WalletButton />

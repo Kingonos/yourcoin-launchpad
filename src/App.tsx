@@ -10,6 +10,9 @@ import { config } from './lib/wagmi';
 import Home from "./pages/Home";
 import Mint from "./pages/Mint";
 import Swap from "./pages/Swap";
+import Mining from "./pages/Mining";
+import Admin from "./pages/Admin";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/mint" element={<Mint />} />
               <Route path="/swap" element={<Swap />} />
+              <Route path="/mining" element={<Mining />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
