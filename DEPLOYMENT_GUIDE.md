@@ -15,7 +15,7 @@
 
 Before you begin, ensure you have:
 - Node.js (v18 or higher) and npm installed
-- MetaMask wallet installed
+- Web3 wallet installed (MetaMask, Trust Wallet, or any WalletConnect-compatible wallet)
 - MATIC tokens on Mumbai testnet (get from [Mumbai Faucet](https://faucet.polygon.technology/))
 - Basic understanding of Ethereum/Polygon blockchain
 - A WalletConnect Project ID (get from [WalletConnect Cloud](https://cloud.walletconnect.com/))

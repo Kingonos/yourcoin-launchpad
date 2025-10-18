@@ -43,6 +43,9 @@ const Home = () => {
             {!isConnected && (
               <div className="flex flex-col items-center gap-4">
                 <p className="text-lg text-foreground">Connect your wallet to get started</p>
+                <p className="text-sm text-muted-foreground">
+                  Supports MetaMask, Trust Wallet, WalletConnect, and more
+                </p>
               </div>
             )}
           </div>

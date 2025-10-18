@@ -4,7 +4,7 @@ A modern Web3 DeFi launchpad built on Polygon for minting and swapping YOUR toke
 
 ## Features
 
-- 🔗 **Wallet Connection** - Connect with MetaMask or WalletConnect
+- 🔗 **Wallet Connection** - Connect with MetaMask, Trust Wallet, WalletConnect, and more
 - 💰 **Balance Display** - View YOUR token and USDC balances in real-time
 - 🪙 **One-Click Minting** - Mint YOUR tokens instantly with gas estimates
 - 🔄 **Token Swapping** - Trade YOUR for USDC via QuickSwap integration
@@ -24,7 +24,7 @@ A modern Web3 DeFi launchpad built on Polygon for minting and swapping YOUR toke
 ### Prerequisites
 
 - Node.js 18+ and npm
-- MetaMask or compatible Web3 wallet
+- Web3 wallet (MetaMask, Trust Wallet, or any WalletConnect-compatible wallet)
 - MATIC tokens on Mumbai testnet ([Get from faucet](https://faucet.polygon.technology/))
 
 ### Installation
