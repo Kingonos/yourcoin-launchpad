@@ -43,11 +43,15 @@ The app will be available at `http://localhost:8080`
 
 ### 1. WalletConnect Project ID
 
-Get your Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/) and update `src/lib/wagmi.ts`:
+1. Get your Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com/)
+2. Create a `.env.local` file in the project root (copy from `.env.example`)
+3. Add your Project ID:
 
-```typescript
-projectId: 'YOUR_PROJECT_ID'
+```env
+VITE_WALLETCONNECT_PROJECT_ID=your_actual_project_id_here
 ```
+
+**Important:** Without a valid Project ID, wallet connections won't work!
 
 ### 2. Token Addresses
 
