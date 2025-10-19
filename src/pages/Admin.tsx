@@ -159,9 +159,16 @@ export default function Admin() {
           <Card className="glass-card p-8 max-w-md mx-auto text-center">
             <Shield className="w-12 h-12 text-destructive mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               You don't have admin privileges to access this page
             </p>
+            <div className="space-y-2 text-sm text-left bg-muted/50 p-4 rounded-lg">
+              <p className="font-semibold">To get admin access:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Sign up/login at the <a href="/auth" className="text-primary hover:underline">Auth page</a></li>
+                <li>Contact the system administrator to grant you admin role</li>
+              </ol>
+            </div>
           </Card>
         </main>
       </div>
