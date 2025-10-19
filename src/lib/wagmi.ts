@@ -3,7 +3,7 @@ import { polygon, polygonAmoy } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
   appName: 'YourCoin Launchpad',
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '7c3a3c9637c79702d72cc7ccc7d99acd', // Get from WalletConnect Cloud
+  projectId: '7c3a3c9637c79702d72cc7ccc7d99acd',
   chains: [polygonAmoy, polygon],
   ssr: false,
 });
