@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { Header } from '@/components/Header';
 import { BalanceCard } from '@/components/BalanceCard';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Coins, Repeat } from 'lucide-react';
+import { ArrowRight, Coins, Repeat, Vault } from 'lucide-react';
 import { formatUnits } from 'viem';
+import { supabase } from '@/integrations/supabase/client';
 
 // YOUR token contract address on Polygon Mumbai testnet
 const YOUR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000'; // Replace with actual address
@@ -12,6 +14,8 @@ const USDC_ADDRESS = '0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97'; // USDC on Mu
 
 const Home = () => {
   const { address, isConnected } = useAccount();
+  const [treasuryBalance, setTreasuryBalance] = useState<number>(0);
+  const [loadingTreasury, setLoadingTreasury] = useState(false);
 
   const yourBalance = useBalance({
     address: address,
@@ -22,6 +26,33 @@ const Home = () => {
     address: address,
     token: USDC_ADDRESS as `0x${string}`,
   });
+
+  useEffect(() => {
+    if (isConnected) {
+      fetchTreasuryBalance();
+    }
+  }, [isConnected]);
+
+  const fetchTreasuryBalance = async () => {
+    setLoadingTreasury(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('balances')
+        .select('balance')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      setTreasuryBalance(data?.balance || 0);
+    } catch (error) {
+      console.error('Error fetching treasury balance:', error);
+    } finally {
+      setLoadingTreasury(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,9 +84,15 @@ const Home = () => {
           {isConnected && address && (
             <div className="max-w-4xl mx-auto">
               <h2 className="text-2xl font-bold mb-6 text-center">Your Balances</h2>
-              <div className="grid md:grid-cols-2 gap-6 mb-12">
+              <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <BalanceCard
-                  token="YOUR Token"
+                  token="Treasury Balance"
+                  balance={treasuryBalance.toLocaleString()}
+                  loading={loadingTreasury}
+                  icon="🏦"
+                />
+                <BalanceCard
+                  token="YOUR Token (Wallet)"
                   balance={yourBalance.data ? formatUnits(yourBalance.data.value, yourBalance.data.decimals) : '0.00'}
                   loading={yourBalance.isLoading}
                   icon="🪙"
@@ -68,7 +105,20 @@ const Home = () => {
                 />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <Link to="/treasury" className="block">
+                  <div className="glass-card p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
+                    <div className="flex items-center justify-between mb-4">
+                      <Vault className="w-12 h-12 text-accent" />
+                      <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">Treasury</h3>
+                    <p className="text-muted-foreground">
+                      Deposit and withdraw YOUR tokens securely
+                    </p>
+                  </div>
+                </Link>
+
                 <Link to="/mint" className="block">
                   <div className="glass-card p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
                     <div className="flex items-center justify-between mb-4">
