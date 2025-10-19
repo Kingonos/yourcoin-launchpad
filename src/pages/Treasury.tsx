@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Vault, TrendingUp, TrendingDown, History } from "lucide-react";
+import { Loader2, Vault, TrendingUp, TrendingDown, History, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Session } from "@supabase/supabase-js";
 
 export default function Treasury() {
   const { address, isConnected } = useAccount();
@@ -19,13 +20,35 @@ export default function Treasury() {
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   useEffect(() => {
-    if (isConnected) {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (session && isConnected) {
       fetchBalance();
       fetchTransactions();
     }
-  }, [isConnected]);
+  }, [session, isConnected]);
+
+  const checkAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      
+      if (!session) {
+        toast.error("Please sign in to access Treasury");
+        navigate("/auth");
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+    } finally {
+      setIsAuthChecking(false);
+    }
+  };
 
   const fetchBalance = async () => {
     try {
@@ -158,6 +181,39 @@ export default function Treasury() {
     }
   };
 
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <Header />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <div className="flex items-center justify-center h-96">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+        <Header />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <Card className="glass-card p-8 max-w-md mx-auto text-center">
+            <LogIn className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2">Authentication Required</h2>
+            <p className="text-muted-foreground mb-6">
+              Please sign in to access the Treasury
+            </p>
+            <Button onClick={() => navigate("/auth")} className="w-full">
+              Go to Sign In
+            </Button>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Header />
@@ -223,6 +279,11 @@ export default function Treasury() {
               </TabsContent>
 
               <TabsContent value="withdraw" className="space-y-4 mt-6">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-blue-400">
+                    ℹ️ Withdrawing transfers YOUR tokens from your Treasury balance to your connected wallet
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="withdraw-amount">Withdraw Amount</Label>
                   <Input
@@ -253,7 +314,7 @@ export default function Treasury() {
                   ) : (
                     <>
                       <TrendingDown className="mr-2 h-4 w-4" />
-                      Withdraw Tokens
+                      Withdraw to Wallet
                     </>
                   )}
                 </Button>
