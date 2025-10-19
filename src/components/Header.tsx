@@ -50,6 +50,14 @@ export const Header = () => {
               Mining
             </Link>
             <Link
+              to="/treasury"
+              className={`transition-colors ${
+                isActive('/treasury') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Treasury
+            </Link>
+            <Link
               to="/admin"
               className={`transition-colors ${
                 isActive('/admin') ? 'text-primary' : 'text-muted-foreground hover:text-foreground'

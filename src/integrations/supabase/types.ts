@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      balances: {
+        Row: {
+          balance: number
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mining_config: {
         Row: {
           cooldown_hours: number
@@ -67,6 +91,33 @@ export type Database = {
           last_claim_at?: string | null
           total_mined?: number | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      treasury_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string | null
+          id: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string | null
+          id?: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string | null
+          id?: string
+          transaction_type?: string
           user_id?: string
         }
         Relationships: []
