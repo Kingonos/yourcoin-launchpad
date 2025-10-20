@@ -1,10 +1,10 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { polygon, mainnet, bsc, arbitrum } from 'wagmi/chains';
+import { bsc, bscTestnet, mainnet, arbitrum } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
   appName: 'YourCoin Launchpad',
   projectId: '7c3a3c9637c79702d72cc7ccc7d99acd',
-  chains: [polygon, mainnet, bsc, arbitrum],
+  chains: [bsc, bscTestnet, mainnet, arbitrum],
   ssr: false,
 });
 
@@ -12,6 +12,6 @@ export const config = getDefaultConfig({
 if (import.meta.env.DEV) {
   console.log('🔌 Wallet Configuration:', {
     projectId: '✅ Set',
-    chains: ['Polygon', 'Ethereum', 'BSC', 'Arbitrum'],
+    chains: ['BSC Mainnet', 'BSC Testnet', 'Ethereum', 'Arbitrum'],
   });
 }
