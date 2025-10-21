@@ -34,7 +34,7 @@ const Mint = () => {
 
       if (error) throw error;
 
-      toast.success(`Successfully minted ${amount} YOUR tokens!`);
+      toast.success(`Successfully minted ${amount} YRC tokens!`);
       setAmount('100');
     } catch (error: any) {
       console.error('Minting error:', error);

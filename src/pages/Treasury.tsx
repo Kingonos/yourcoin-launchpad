@@ -217,33 +217,33 @@ export default function Treasury() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Header />
-      <main className="container mx-auto px-4 py-8 mt-20">
-        <div className="max-w-4xl mx-auto space-y-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-20">
+        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Treasury Vault
             </h1>
-            <p className="text-muted-foreground">
-              Deposit and withdraw YOUR tokens securely
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Deposit and withdraw YRC tokens securely
             </p>
           </div>
 
-          <Card className="glass-card p-8">
+          <Card className="glass-card p-4 sm:p-6 lg:p-8">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Vault className="w-8 h-8 text-primary" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Vault className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Balance</p>
-                  <p className="text-3xl font-bold">{balance.toLocaleString()} YOUR</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Total Balance</p>
+                  <p className="text-2xl sm:text-3xl font-bold">{balance.toLocaleString()} YRC</p>
                 </div>
               </div>
             </div>
 
             <Tabs defaultValue="deposit" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="deposit">Deposit</TabsTrigger>
-                <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
-                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="deposit" className="text-xs sm:text-sm">Deposit</TabsTrigger>
+                <TabsTrigger value="withdraw" className="text-xs sm:text-sm">Withdraw</TabsTrigger>
+                <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="deposit" className="space-y-4 mt-6">
@@ -279,9 +279,9 @@ export default function Treasury() {
               </TabsContent>
 
               <TabsContent value="withdraw" className="space-y-4 mt-6">
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-blue-400">
-                    ℹ️ Withdrawing transfers YOUR tokens from your Treasury balance to your connected wallet
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 sm:p-4 mb-4">
+                  <p className="text-xs sm:text-sm text-blue-400">
+                    ℹ️ Withdrawing transfers YRC tokens from your Treasury balance to your connected wallet
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -296,7 +296,7 @@ export default function Treasury() {
                     max={balance}
                   />
                   <p className="text-sm text-muted-foreground">
-                    Available: {balance.toLocaleString()} YOUR
+                    Available: {balance.toLocaleString()} YRC
                   </p>
                 </div>
                 <Button
@@ -331,27 +331,27 @@ export default function Treasury() {
                     transactions.map((tx) => (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                        className="flex items-center justify-between p-3 sm:p-4 rounded-lg border bg-card"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           {tx.transaction_type === "deposit" ? (
-                            <TrendingUp className="w-5 h-5 text-green-500" />
+                            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                           ) : (
-                            <TrendingDown className="w-5 h-5 text-red-500" />
+                            <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                           )}
                           <div>
-                            <p className="font-medium capitalize">{tx.transaction_type}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm sm:text-base font-medium capitalize">{tx.transaction_type}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
                               {new Date(tx.created_at).toLocaleString()}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold">
+                          <p className="text-sm sm:text-base font-bold">
                             {tx.transaction_type === "deposit" ? "+" : "-"}
-                            {Number(tx.amount).toLocaleString()} YOUR
+                            {Number(tx.amount).toLocaleString()} YRC
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             Balance: {Number(tx.balance_after).toLocaleString()}
                           </p>
                         </div>

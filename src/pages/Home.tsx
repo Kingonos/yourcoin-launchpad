@@ -8,9 +8,8 @@ import { ArrowRight, Coins, Repeat, Vault } from 'lucide-react';
 import { formatUnits } from 'viem';
 import { supabase } from '@/integrations/supabase/client';
 
-// YOUR token contract address on Polygon Mumbai testnet
-const YOUR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000'; // Replace with actual address
-const USDC_ADDRESS = '0x9999f7Fea5938fD3b1E26A12c3f2fb024e194f97'; // USDC on Mumbai
+const YOUR_TOKEN_ADDRESS = (import.meta.env.VITE_YRC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
+const USDC_ADDRESS = '0x55d398326f99059fF775485246999027B3197955' as `0x${string}`;
 
 const Home = () => {
   const { address, isConnected } = useAccount();
@@ -54,6 +53,34 @@ const Home = () => {
     }
   };
 
+  const addTokenToWallet = async () => {
+    if (!window.ethereum) {
+      alert('Please install MetaMask or Trust Wallet');
+      return;
+    }
+
+    try {
+      const wasAdded = await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: YOUR_TOKEN_ADDRESS,
+            symbol: 'YRC',
+            decimals: 18,
+            image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
+          },
+        },
+      });
+
+      if (wasAdded) {
+        console.log('YRC token added to wallet');
+      }
+    } catch (error) {
+      console.error('Error adding token to wallet:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -61,19 +88,19 @@ const Home = () => {
       {/* Hero Section with Gradient */}
       <div className="relative pt-24 pb-16 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.15),transparent_50%)]" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center max-w-4xl mx-auto mb-16">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 px-4">
               Welcome to <span className="gradient-text glow-text">YourCoin</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              The next generation DeFi launchpad on Polygon. Mint, trade, and earn with YOUR token.
+            <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 px-4">
+              The next generation DeFi launchpad on BSC. Mint, trade, and earn with YRC token.
             </p>
-            
+
             {!isConnected && (
-              <div className="flex flex-col items-center gap-4">
-                <p className="text-lg text-foreground">Connect your wallet to get started</p>
+              <div className="flex flex-col items-center gap-4 px-4">
+                <p className="text-base sm:text-lg text-foreground">Connect your wallet to get started</p>
                 <p className="text-sm text-muted-foreground">
                   Supports MetaMask, Trust Wallet, WalletConnect, and more
                 </p>
@@ -82,9 +109,19 @@ const Home = () => {
           </div>
 
           {isConnected && address && (
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold mb-6 text-center">Your Balances</h2>
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h2 className="text-2xl font-bold text-center sm:text-left">Your Balances</h2>
+                <Button
+                  onClick={addTokenToWallet}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  Add YRC to Wallet
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
                 <BalanceCard
                   token="Treasury Balance"
                   balance={treasuryBalance.toLocaleString()}
@@ -92,55 +129,55 @@ const Home = () => {
                   icon="🏦"
                 />
                 <BalanceCard
-                  token="YOUR Token (Wallet)"
+                  token="YRC Token (Wallet)"
                   balance={yourBalance.data ? formatUnits(yourBalance.data.value, yourBalance.data.decimals) : '0.00'}
                   loading={yourBalance.isLoading}
                   icon="🪙"
                 />
                 <BalanceCard
-                  token="USDC"
+                  token="USDT"
                   balance={usdcBalance.data ? formatUnits(usdcBalance.data.value, usdcBalance.data.decimals) : '0.00'}
                   loading={usdcBalance.isLoading}
                   icon="💵"
                 />
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <Link to="/treasury" className="block">
-                  <div className="glass-card p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
+                  <div className="glass-card p-6 sm:p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
                     <div className="flex items-center justify-between mb-4">
-                      <Vault className="w-12 h-12 text-accent" />
-                      <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                      <Vault className="w-10 h-10 sm:w-12 sm:h-12 text-accent" />
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Treasury</h3>
-                    <p className="text-muted-foreground">
-                      Deposit and withdraw YOUR tokens securely
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Treasury</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      Deposit and withdraw YRC tokens securely
                     </p>
                   </div>
                 </Link>
 
                 <Link to="/mint" className="block">
-                  <div className="glass-card p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
+                  <div className="glass-card p-6 sm:p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
                     <div className="flex items-center justify-between mb-4">
-                      <Coins className="w-12 h-12 text-primary" />
-                      <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                      <Coins className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Mint YOUR</h3>
-                    <p className="text-muted-foreground">
-                      Mint new YOUR tokens instantly with one click
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Mint YRC</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      Mint new YRC tokens instantly with one click
                     </p>
                   </div>
                 </Link>
 
                 <Link to="/swap" className="block">
-                  <div className="glass-card p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
+                  <div className="glass-card p-6 sm:p-8 rounded-2xl hover:shadow-glow transition-all duration-300 group cursor-pointer">
                     <div className="flex items-center justify-between mb-4">
-                      <Repeat className="w-12 h-12 text-secondary" />
-                      <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-secondary group-hover:translate-x-1 transition-all" />
+                      <Repeat className="w-10 h-10 sm:w-12 sm:h-12 text-secondary" />
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-secondary group-hover:translate-x-1 transition-all" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">Swap Tokens</h3>
-                    <p className="text-muted-foreground">
-                      Trade YOUR for USDC on QuickSwap with best rates
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Swap Tokens</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      Trade YRC for USDT on PancakeSwap with best rates
                     </p>
                   </div>
                 </Link>

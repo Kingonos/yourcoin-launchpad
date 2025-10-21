@@ -9,14 +9,14 @@ export const Header = () => {
 
   return (
     <header className="border-b border-border/50 backdrop-blur-xl fixed top-0 w-full z-50 glass-card">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Coins className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-bold gradient-text">YourCoin</span>
+            <Coins className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            <span className="text-xl sm:text-2xl font-bold gradient-text">YourCoin</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm lg:text-base">
             <Link
               to="/"
               className={`transition-colors ${
