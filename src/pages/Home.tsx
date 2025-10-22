@@ -9,7 +9,7 @@ import { formatUnits } from 'viem';
 import { supabase } from '@/integrations/supabase/client';
 
 const YOUR_TOKEN_ADDRESS = (import.meta.env.VITE_YRC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
-const USDC_ADDRESS = '0x55d398326f99059fF775485246999027B3197955' as `0x${string}`;
+const USDC_ADDRESS = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' as `0x${string}`;
 
 const Home = () => {
   const { address, isConnected } = useAccount();
@@ -68,7 +68,7 @@ const Home = () => {
             address: YOUR_TOKEN_ADDRESS,
             symbol: 'YRC',
             decimals: 18,
-            image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
+            image: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png',
           },
         },
       });
@@ -95,7 +95,7 @@ const Home = () => {
               Welcome to <span className="gradient-text glow-text">YourCoin</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 px-4">
-              The next generation DeFi launchpad on BSC. Mint, trade, and earn with YRC token.
+              The next generation DeFi launchpad on Polygon. Mint, trade, and earn with YRC token.
             </p>
 
             {!isConnected && (
@@ -135,7 +135,7 @@ const Home = () => {
                   icon="🪙"
                 />
                 <BalanceCard
-                  token="USDT"
+                  token="USDC"
                   balance={usdcBalance.data ? formatUnits(usdcBalance.data.value, usdcBalance.data.decimals) : '0.00'}
                   loading={usdcBalance.isLoading}
                   icon="💵"
@@ -177,7 +177,7 @@ const Home = () => {
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold mb-2">Swap Tokens</h3>
                     <p className="text-sm sm:text-base text-muted-foreground">
-                      Trade YRC for USDT on PancakeSwap with best rates
+                      Trade YRC for USDC on QuickSwap with best rates
                     </p>
                   </div>
                 </Link>

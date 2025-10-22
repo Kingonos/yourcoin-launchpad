@@ -53,10 +53,10 @@ const Mint = () => {
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                <span className="gradient-text">Mint YOUR Tokens</span>
+                <span className="gradient-text">Mint YRC Tokens</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Mint new YOUR tokens instantly to your wallet
+                Mint new YRC tokens instantly to your wallet
               </p>
             </div>
 
@@ -82,14 +82,14 @@ const Mint = () => {
                     min="1"
                   />
                   <p className="text-sm text-muted-foreground mt-2">
-                    Minimum: 1 YOUR • Maximum: 10,000 YOUR
+                    Minimum: 1 YRC • Maximum: 10,000 YRC
                   </p>
                 </div>
 
                 <div className="glass-card p-4 rounded-lg space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Network</span>
-                    <span className="text-foreground">Polygon Mumbai</span>
+                    <span className="text-foreground">Polygon Mainnet</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Est. Gas Fee</span>
@@ -97,7 +97,7 @@ const Mint = () => {
                   </div>
                   <div className="flex justify-between text-sm pt-2 border-t border-border/30">
                     <span className="text-foreground font-semibold">You'll receive</span>
-                    <span className="text-primary font-semibold">{amount} YOUR</span>
+                    <span className="text-primary font-semibold">{amount} YRC</span>
                   </div>
                 </div>
 
@@ -127,7 +127,7 @@ const Mint = () => {
 
                 <div className="text-center pt-4">
                   <p className="text-sm text-muted-foreground">
-                    Minting is free (you only pay gas fees). YOUR tokens will appear in your wallet
+                    Minting is free (you only pay gas fees). YRC tokens will appear in your wallet
                     within seconds.
                   </p>
                 </div>

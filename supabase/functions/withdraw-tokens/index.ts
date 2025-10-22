@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.39.3";
 import { createWalletClient, http, parseEther, formatEther } from "npm:viem@2.21.54";
 import { privateKeyToAccount } from "npm:viem@2.21.54/accounts";
-import { bsc } from "npm:viem@2.21.54/chains";
+import { polygon } from "npm:viem@2.21.54/chains";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -95,7 +95,7 @@ Deno.serve(async (req: Request) => {
     const account = privateKeyToAccount(`0x${adminPrivateKey}` as `0x${string}`);
     const walletClient = createWalletClient({
       account,
-      chain: bsc,
+      chain: polygon,
       transport: http(rpcUrl),
     });
 
