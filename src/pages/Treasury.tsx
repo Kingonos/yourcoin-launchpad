@@ -134,7 +134,7 @@ export default function Treasury() {
   };
 
   const handleWithdraw = async () => {
-    if (!isConnected) {
+    if (!isConnected || !address) {
       toast.error("Please connect your wallet first");
       return;
     }
@@ -160,13 +160,19 @@ export default function Treasury() {
       }
 
       const { data, error } = await supabase.functions.invoke("withdraw-tokens", {
-        body: { amount },
+        body: {
+          amount,
+          walletAddress: address
+        },
       });
 
       if (error) throw error;
 
       if (data.success) {
         toast.success(data.message);
+        if (data.transactionHash) {
+          toast.success(`Transaction hash: ${data.transactionHash.slice(0, 10)}...`);
+        }
         setWithdrawAmount("");
         await fetchBalance();
         await fetchTransactions();

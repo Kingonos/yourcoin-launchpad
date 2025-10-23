@@ -59,6 +59,11 @@ const Home = () => {
       return;
     }
 
+    if (YOUR_TOKEN_ADDRESS === '0x0000000000000000000000000000000000000000') {
+      alert('YRC contract address is not configured. Please deploy your contract and update VITE_YRC_CONTRACT_ADDRESS in .env file.');
+      return;
+    }
+
     try {
       const wasAdded = await window.ethereum.request({
         method: 'wallet_watchAsset',
@@ -74,10 +79,11 @@ const Home = () => {
       });
 
       if (wasAdded) {
-        console.log('YRC token added to wallet');
+        alert('YRC token successfully added to your wallet!');
       }
     } catch (error) {
       console.error('Error adding token to wallet:', error);
+      alert('Failed to add token to wallet. Please try again.');
     }
   };
 
