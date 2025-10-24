@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useAccount } from 'wagmi';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Settings, Users, Coins } from 'lucide-react';
+import { Shield, Settings, Users, Coins, Plus } from 'lucide-react';
 
 export default function Admin() {
   const { isConnected } = useAccount();
@@ -23,6 +23,9 @@ export default function Admin() {
     totalUsers: 0,
     totalMined: 0,
   });
+  const [creditAmount, setCreditAmount] = useState('');
+  const [creditEmail, setCreditEmail] = useState('');
+  const [creditLoading, setCreditLoading] = useState(false);
 
   useEffect(() => {
     if (isConnected) {
@@ -119,6 +122,83 @@ export default function Admin() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreditTokens = async () => {
+    if (!creditAmount) {
+      toast({
+        title: "Missing information",
+        description: "Please enter an amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const amount = parseFloat(creditAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid positive number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCreditLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data: balanceData } = await supabase
+        .from('balances')
+        .select('balance')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const currentBalance = balanceData?.balance || 0;
+      const newBalance = Number(currentBalance) + amount;
+
+      const { error: upsertError } = await supabase
+        .from('balances')
+        .upsert({
+          user_id: user.id,
+          balance: newBalance,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (upsertError) throw upsertError;
+
+      const { error: txError } = await supabase
+        .from('treasury_transactions')
+        .insert({
+          user_id: user.id,
+          transaction_type: 'deposit',
+          amount: amount,
+          balance_after: newBalance,
+        });
+
+      if (txError) throw txError;
+
+      toast({
+        title: "Tokens credited",
+        description: `Successfully added ${amount.toLocaleString()} YRC to your treasury`,
+      });
+
+      setCreditAmount('');
+      await fetchStats();
+    } catch (error: any) {
+      toast({
+        title: "Credit failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setCreditLoading(false);
     }
   };
 
@@ -270,6 +350,39 @@ export default function Admin() {
                 className="w-full"
               >
                 {loading ? 'Updating...' : 'Update Configuration'}
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="glass-card p-6 mt-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Plus className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl font-bold">Add Tokens to Your Treasury</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="creditAmount">Amount (YRC)</Label>
+                <Input
+                  id="creditAmount"
+                  type="number"
+                  value={creditAmount}
+                  onChange={(e) => setCreditAmount(e.target.value)}
+                  placeholder="10000000000000000000000000000000000000"
+                  className="mt-2"
+                />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Enter the amount of YRC tokens to add to your treasury balance
+                </p>
+              </div>
+
+              <Button
+                onClick={handleCreditTokens}
+                disabled={creditLoading}
+                size="lg"
+                className="w-full"
+              >
+                {creditLoading ? 'Processing...' : 'Add Tokens to Treasury'}
               </Button>
             </div>
           </Card>
