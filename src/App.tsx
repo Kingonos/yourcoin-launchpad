@@ -13,7 +13,6 @@ import Swap from "./pages/Swap";
 import Mining from "./pages/Mining";
 import Treasury from "./pages/Treasury";
 import Admin from "./pages/Admin";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,7 +36,6 @@ const App = () => (
               <Route path="/mining" element={<Mining />} />
               <Route path="/treasury" element={<Treasury />} />
               <Route path="/admin" element={<Admin />} />
-              <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

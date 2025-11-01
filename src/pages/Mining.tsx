@@ -44,13 +44,10 @@ export default function Mining() {
   };
 
   const fetchMiningData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
     const { data, error } = await supabase
       .from('mining_rewards')
       .select('*')
-      .eq('user_id', user.id)
+      .limit(1)
       .maybeSingle();
 
     if (!error && data) {
