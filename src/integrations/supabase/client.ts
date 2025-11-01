@@ -2,25 +2,32 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 // Support both ANON and PUBLISHABLE key env names
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 if (import.meta.env.DEV) {
-  if (!import.meta.env.VITE_SUPABASE_URL) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     // eslint-disable-next-line no-console
-    console.warn("[Supabase] Missing VITE_SUPABASE_URL env var - using placeholder");
-  }
-  if (!import.meta.env.VITE_SUPABASE_ANON_KEY && !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+    console.error("[Supabase] CRITICAL ERROR: Missing environment variables!");
+    console.error("[Supabase] VITE_SUPABASE_URL:", SUPABASE_URL ? "✅" : "❌ MISSING");
+    console.error("[Supabase] VITE_SUPABASE_ANON_KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY ? "✅" : "❌ MISSING");  
+    console.error("[Supabase] VITE_SUPABASE_PUBLISHABLE_KEY:", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ? "✅" : "❌ MISSING");
+    console.error("[Supabase] Please check your .env file and refresh the preview");
+  } else {
     // eslint-disable-next-line no-console
-    console.warn("[Supabase] Missing VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY env var - using placeholder");
+    console.log("[Supabase] ✅ Client configured successfully");
   }
 }
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+// Create client with fallback to prevent crashes
+const supabaseUrl = SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTI4MTIsImV4cCI6MTk2MDc2ODgxMn0.placeholder';
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: localStorage,
     persistSession: true,

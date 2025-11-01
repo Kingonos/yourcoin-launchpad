@@ -43,7 +43,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
@@ -52,6 +52,7 @@ export default function Auth() {
       });
 
       if (error) {
+        console.error("Signup error:", error);
         if (error.message.includes("already registered")) {
           toast({
             title: "Email already registered",
@@ -73,10 +74,11 @@ export default function Auth() {
         setEmail("");
         setPassword("");
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Signup catch error:", error);
       toast({
         title: "Sign up failed",
-        description: "An unexpected error occurred",
+        description: error?.message || "NetworkError when attempting to fetch resource.",
         variant: "destructive",
       });
     } finally {
