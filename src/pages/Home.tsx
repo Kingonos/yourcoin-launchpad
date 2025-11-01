@@ -8,6 +8,13 @@ import { ArrowRight, Coins, Repeat, Vault } from 'lucide-react';
 import { formatUnits } from 'viem';
 import { supabase } from '@/integrations/supabase/client';
 
+// Detect if backend env is available to avoid runtime crashes in preview
+const SUPABASE_READY = Boolean(
+  import.meta.env.VITE_SUPABASE_URL &&
+  (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
+);
+
+
 const YOUR_TOKEN_ADDRESS = (import.meta.env.VITE_YRC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`;
 const USDC_ADDRESS = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' as `0x${string}`;
 

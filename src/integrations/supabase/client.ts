@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-// Use the standard anon key env var name expected in Vite apps
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Support both ANON and PUBLISHABLE key env names
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +16,7 @@ if (import.meta.env.DEV) {
   }
   if (!SUPABASE_ANON_KEY) {
     // eslint-disable-next-line no-console
-    console.warn("[Supabase] Missing VITE_SUPABASE_ANON_KEY env var");
+    console.warn("[Supabase] Missing VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY env var");
   }
 }
 
