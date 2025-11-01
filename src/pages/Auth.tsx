@@ -109,12 +109,16 @@ export default function Auth() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("[Auth] Attempting sign in...");
+      const { error, data } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
+      console.log("[Auth] Sign in response:", { error: error?.message, hasSession: !!data.session });
+
       if (error) {
+        console.error("[Auth] Sign in error:", error);
         if (error.message.includes("Invalid login credentials")) {
           toast({
             title: "Invalid credentials",
@@ -136,10 +140,11 @@ export default function Auth() {
 
         navigate("/");
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("[Auth] Sign in catch error:", error);
       toast({
         title: "Sign in failed",
-        description: "An unexpected error occurred",
+        description: error?.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
