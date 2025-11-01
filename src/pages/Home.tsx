@@ -40,6 +40,11 @@ const Home = () => {
   }, [isConnected]);
 
   const fetchTreasuryBalance = async () => {
+    if (!SUPABASE_READY) {
+      // Supabase not configured; skip fetching to avoid runtime errors in preview
+      setTreasuryBalance(0);
+      return;
+    }
     setLoadingTreasury(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();

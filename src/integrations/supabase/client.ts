@@ -2,21 +2,21 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
 // Support both ANON and PUBLISHABLE key env names
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 if (import.meta.env.DEV) {
-  if (!SUPABASE_URL) {
+  if (!import.meta.env.VITE_SUPABASE_URL) {
     // eslint-disable-next-line no-console
-    console.warn("[Supabase] Missing VITE_SUPABASE_URL env var");
+    console.warn("[Supabase] Missing VITE_SUPABASE_URL env var - using placeholder");
   }
-  if (!SUPABASE_ANON_KEY) {
+  if (!import.meta.env.VITE_SUPABASE_ANON_KEY && !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
     // eslint-disable-next-line no-console
-    console.warn("[Supabase] Missing VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY env var");
+    console.warn("[Supabase] Missing VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY env var - using placeholder");
   }
 }
 
