@@ -8,6 +8,7 @@ import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { config } from './lib/wagmi';
 import Home from "./pages/Home";
+import Auth from "./pages/Auth";
 import Mint from "./pages/Mint";
 import Swap from "./pages/Swap";
 import Mining from "./pages/Mining";
@@ -31,6 +32,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="/mint" element={<Mint />} />
               <Route path="/swap" element={<Swap />} />
               <Route path="/mining" element={<Mining />} />
