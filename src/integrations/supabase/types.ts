@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          amount: number | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          amount?: number | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          amount?: number | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       balances: {
         Row: {
           balance: number
@@ -91,6 +124,33 @@ export type Database = {
           last_claim_at?: string | null
           total_mined?: number | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      processed_transactions: {
+        Row: {
+          amount: number
+          id: string
+          processed_at: string | null
+          transaction_hash: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          id?: string
+          processed_at?: string | null
+          transaction_hash: string
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          id?: string
+          processed_at?: string | null
+          transaction_hash?: string
+          transaction_type?: string
           user_id?: string
         }
         Relationships: []

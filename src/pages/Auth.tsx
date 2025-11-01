@@ -1,42 +1,82 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { Coins } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { Coins } from "lucide-react";
+import { Link } from "react-router-dom";
+import { authSchema } from "@/lib/validation";
+import { z } from "zod";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // Validate inputs
+    try {
+      authSchema.parse({ email, password });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: { email?: string; password?: string } = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0] as "email" | "password"] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
 
-      if (error) throw error;
-
-      toast({
-        title: "Account created!",
-        description: "You can now sign in with your credentials",
-      });
-    } catch (error: any) {
+      if (error) {
+        if (error.message.includes("already registered")) {
+          toast({
+            title: "Email already registered",
+            description: "This email is already registered. Please sign in instead.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Sign up failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Account created!",
+          description: "You can now sign in with your credentials",
+        });
+        setEmail("");
+        setPassword("");
+      }
+    } catch (error) {
       toast({
         title: "Sign up failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -46,26 +86,58 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // Validate inputs
+    try {
+      authSchema.parse({ email, password });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: { email?: string; password?: string } = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0] as "email" | "password"] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          toast({
+            title: "Invalid credentials",
+            description: "Invalid email or password. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Sign in failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You've successfully signed in",
+        });
 
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in",
-      });
-      
-      navigate('/');
-    } catch (error: any) {
+        navigate("/");
+      }
+    } catch (error) {
       toast({
         title: "Sign in failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -102,10 +174,16 @@ export default function Auth() {
                     type="email"
                     placeholder="you@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
                     required
-                    className="mt-2"
+                    className={`mt-2 ${errors.email ? "border-red-500" : ""}`}
                   />
+                  {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="signin-password">Password</Label>
@@ -114,18 +192,19 @@ export default function Auth() {
                     type="password"
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
                     required
-                    className="mt-2"
+                    className={`mt-2 ${errors.password ? "border-red-500" : ""}`}
                   />
+                  {errors.password && (
+                    <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+                  )}
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  size="lg"
-                  disabled={loading}
-                >
-                  {loading ? 'Signing in...' : 'Sign In'}
+                <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
@@ -139,34 +218,40 @@ export default function Auth() {
                     type="email"
                     placeholder="you@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
                     required
-                    className="mt-2"
+                    className={`mt-2 ${errors.email ? "border-red-500" : ""}`}
                   />
+                  {errors.email && (
+                    <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="signup-password">Password</Label>
                   <Input
                     id="signup-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="Create a password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
                     required
-                    minLength={6}
-                    className="mt-2"
+                    className={`mt-2 ${errors.password ? "border-red-500" : ""}`}
                   />
+                  {errors.password && (
+                    <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+                  )}
                   <p className="text-xs text-muted-foreground mt-1">
-                    Minimum 6 characters
+                    Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number
                   </p>
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  size="lg"
-                  disabled={loading}
-                >
-                  {loading ? 'Creating account...' : 'Sign Up'}
+                <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                  {loading ? "Creating account..." : "Sign Up"}
                 </Button>
               </form>
             </TabsContent>

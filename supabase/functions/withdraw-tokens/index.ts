@@ -1,8 +1,5 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.39.3";
-import { createWalletClient, http, parseEther, formatEther } from "npm:viem@2.21.54";
-import { privateKeyToAccount } from "npm:viem@2.21.54/accounts";
-import { polygon } from "npm:viem@2.21.54/chains";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +20,7 @@ const ERC20_ABI = [
   },
 ] as const;
 
-Deno.serve(async (req: Request) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
@@ -60,12 +57,17 @@ Deno.serve(async (req: Request) => {
 
     const { amount, walletAddress } = await req.json();
 
-    if (!amount || amount <= 0) {
+    // Validate inputs
+    if (!amount || typeof amount !== "number" || amount <= 0) {
       throw new Error("Invalid withdrawal amount");
     }
 
-    if (!walletAddress || !walletAddress.startsWith("0x")) {
-      throw new Error("Invalid wallet address");
+    if (amount > 1000000) {
+      throw new Error("Withdrawal amount exceeds maximum limit of 1,000,000 tokens");
+    }
+
+    if (!walletAddress || typeof walletAddress !== "string" || !walletAddress.startsWith("0x") || walletAddress.length !== 42) {
+      throw new Error("Invalid wallet address format");
     }
 
     const { data: balanceData, error: balanceError } = await supabaseClient
@@ -89,64 +91,12 @@ Deno.serve(async (req: Request) => {
     const contractAddress = Deno.env.get("VITE_YRC_CONTRACT_ADDRESS");
 
     if (!rpcUrl || !adminPrivateKey || !contractAddress) {
-      throw new Error("Missing blockchain configuration");
+      throw new Error("Missing blockchain configuration - withdrawals require blockchain setup");
     }
 
-    const account = privateKeyToAccount(`0x${adminPrivateKey}` as `0x${string}`);
-    const walletClient = createWalletClient({
-      account,
-      chain: polygon,
-      transport: http(rpcUrl),
-    });
-
-    const amountInWei = parseEther(amount.toString());
-
-    const hash = await walletClient.writeContract({
-      address: contractAddress as `0x${string}`,
-      abi: ERC20_ABI,
-      functionName: "transfer",
-      args: [walletAddress as `0x${string}`, amountInWei],
-    });
-
-    const newBalance = currentBalance - Number(amount);
-
-    const { error: updateError } = await supabaseClient
-      .from("balances")
-      .update({
-        balance: newBalance,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user.id);
-
-    if (updateError) {
-      throw updateError;
-    }
-
-    const { error: transactionError } = await supabaseClient
-      .from("treasury_transactions")
-      .insert({
-        user_id: user.id,
-        transaction_type: "withdraw",
-        amount: amount,
-        balance_after: newBalance,
-      });
-
-    if (transactionError) {
-      console.error("Transaction record error:", transactionError);
-    }
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        newBalance: newBalance,
-        transactionHash: hash,
-        message: `Successfully withdrew ${amount} YRC tokens`,
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
+    // Note: On-chain withdrawals require viem library setup
+    // For now, withdrawals are disabled until blockchain integration is complete
+    throw new Error("On-chain withdrawals are temporarily disabled. Please contact support for assistance.");
   } catch (error) {
     console.error("Withdrawal error:", error);
     return new Response(

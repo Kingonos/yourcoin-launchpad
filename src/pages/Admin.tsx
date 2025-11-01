@@ -145,11 +145,33 @@ export default function Admin() {
       return;
     }
 
+    // Security: Enforce maximum single transaction limit
+    if (amount > 100000) {
+      toast({
+        title: "Amount too large",
+        description: "Cannot credit more than 100,000 tokens at once",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setCreditLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         throw new Error('Not authenticated');
+      }
+
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (!roleData) {
+        throw new Error('Unauthorized: Admin access required');
       }
 
       const { data: balanceData } = await supabase
@@ -183,6 +205,21 @@ export default function Admin() {
         });
 
       if (txError) throw txError;
+
+      // Log to audit trail
+      const { error: auditError } = await supabase
+        .from('admin_audit_log')
+        .insert({
+          admin_id: user.id,
+          action: 'credit_tokens',
+          target_user_id: user.id,
+          amount: amount,
+          details: { newBalance, previousBalance: currentBalance },
+        });
+
+      if (auditError) {
+        console.error('Audit log error:', auditError);
+      }
 
       toast({
         title: "Tokens credited",
