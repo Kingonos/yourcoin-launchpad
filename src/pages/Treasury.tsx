@@ -17,6 +17,7 @@ export default function Treasury() {
   const navigate = useNavigate();
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -102,6 +103,13 @@ export default function Treasury() {
       return;
     }
 
+    // Validate transaction hash
+    const tx = transactionHash.trim();
+    if (!tx || !/^0x[a-fA-F0-9]{64}$/.test(tx)) {
+      toast.error("Enter a valid Polygon transaction hash (0x...)");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -112,7 +120,7 @@ export default function Treasury() {
       }
 
       const { data, error } = await supabase.functions.invoke("deposit-tokens", {
-        body: { amount },
+        body: { transactionHash: tx, amount },
       });
 
       if (error) throw error;
@@ -120,6 +128,7 @@ export default function Treasury() {
       if (data.success) {
         toast.success(data.message);
         setDepositAmount("");
+        setTransactionHash("");
         await fetchBalance();
         await fetchTransactions();
       } else {
@@ -238,15 +247,15 @@ export default function Treasury() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 sm:gap-3">
                 <Vault className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs sm:text-sm text-muted-foreground">Total Balance</p>
-                  <p className="text-2xl sm:text-3xl font-bold">{balance.toLocaleString()} YRC</p>
+                  <p className="text-2xl sm:text-3xl font-bold truncate">{balance.toLocaleString()} YRC</p>
                 </div>
               </div>
             </div>
 
             <Tabs defaultValue="deposit" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+             <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="deposit" className="text-xs sm:text-sm">Deposit</TabsTrigger>
                 <TabsTrigger value="withdraw" className="text-xs sm:text-sm">Withdraw</TabsTrigger>
                 <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
@@ -258,11 +267,26 @@ export default function Treasury() {
                   <Input
                     id="deposit-amount"
                     type="number"
+                    inputMode="decimal"
                     placeholder="Enter amount to deposit"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     disabled={loading}
+                    className="w-full"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deposit-hash">Transaction Hash</Label>
+                  <Input
+                    id="deposit-hash"
+                    type="text"
+                    placeholder="Paste Polygon tx hash (0x...)"
+                    value={transactionHash}
+                    onChange={(e) => setTransactionHash(e.target.value)}
+                    disabled={loading}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">Find this in your wallet activity or Polygonscan.</p>
                 </div>
                 <Button
                   onClick={handleDeposit}
@@ -295,15 +319,17 @@ export default function Treasury() {
                   <Input
                     id="withdraw-amount"
                     type="number"
+                    inputMode="decimal"
                     placeholder="Enter amount to withdraw"
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
                     disabled={loading}
                     max={balance}
+                    className="w-full"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Available: {balance.toLocaleString()} YRC
-                  </p>
+                     Available: {balance.toLocaleString()} YRC
+                   </p>
                 </div>
                 <Button
                   onClick={handleWithdraw}
