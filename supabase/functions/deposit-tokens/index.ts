@@ -99,19 +99,28 @@ serve(async (req) => {
     const currentBalance = balanceData?.balance || 0;
     const newBalance = Number(currentBalance) + Number(amount);
 
-    // Upsert balance
-    const { error: upsertError } = await supabaseClient
-      .from("balances")
-      .upsert(
-        {
+    // Update or insert balance without requiring unique constraint
+    let upsertError: any = null;
+
+    if (balanceData) {
+      const { error } = await supabaseClient
+        .from("balances")
+        .update({
+          balance: newBalance,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+      upsertError = error;
+    } else {
+      const { error } = await supabaseClient
+        .from("balances")
+        .insert({
           user_id: user.id,
           balance: newBalance,
           updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "user_id",
-        }
-      );
+        });
+      upsertError = error;
+    }
 
     if (upsertError) {
       throw upsertError;
