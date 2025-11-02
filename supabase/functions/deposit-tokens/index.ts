@@ -45,11 +45,15 @@ serve(async (req) => {
       throw new Error("User not found");
     }
 
-    const { transactionHash } = await req.json();
+    const { transactionHash, amount } = await req.json();
 
     // Validate input
     if (!transactionHash || typeof transactionHash !== "string" || !transactionHash.match(/^0x[a-fA-F0-9]{64}$/)) {
       throw new Error("Invalid transaction hash format");
+    }
+    
+    if (!amount || typeof amount !== "number" || amount <= 0) {
+      throw new Error("Invalid deposit amount");
     }
 
     // Check if transaction already processed
@@ -64,15 +68,7 @@ serve(async (req) => {
     }
 
     // Note: In production, you should verify the transaction on-chain using viem or ethers
-    // For now, we'll require manual admin verification
     console.log("Processing deposit for transaction:", transactionHash);
-
-    // For demo purposes, extract amount from request (in production, verify on-chain)
-    const { amount } = await req.json();
-    
-    if (!amount || typeof amount !== "number" || amount <= 0) {
-      throw new Error("Invalid deposit amount");
-    }
 
     // Record the processed transaction
     const { error: txRecordError } = await supabaseClient
